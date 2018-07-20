@@ -1,5 +1,6 @@
-import numpy as np
 import random
+import numpy as np
+from collections import OrderedDict
 from bayes_opt import BayesianOptimization
 
 results = np.loadtxt('input_complete_results.txt')
@@ -9,32 +10,30 @@ assert(nparam == results.shape[1]-1)
 params = np.reshape(results[:,:-1], (results.shape[0], nparam))
 max_acc = np.max(results[:, -1]) 
 
-acc_dict = dict()
-tmp_param_dict = dict()
+acc_dict = OrderedDict()
 for iline in range(results.shape[0]):    
-    for i, param_name in enumerate(param_names):
-        tmp_param_dict[param_name] = results[iline, i]
-    acc_dict[np.array(tmp_param_dict.values()).tostring()] = results[iline][-1]
+    acc_dict[np.array(results[iline, :-1]).tostring()] = results[iline][-1]
 
 def target(**inargs):
-    return acc_dict[np.array(inargs.values()).tostring()]
+    ordered_values = [inargs[param_name] for param_name in param_names]
+    return  acc_dict[np.array(ordered_values).tostring()]
 
-init_param_dict = dict()
+init_dict = OrderedDict()
 for i, param_name in enumerate(param_names):
-    init_param_dict[param_name] = (min(params[:,i]), max(params[:,i]))
+    init_dict[param_name] = (min(params[:,i]), max(params[:,i]))
      
 init_sample_num = 2
-bo = BayesianOptimization(target,   init_param_dict, verbose=0)
+bo = BayesianOptimization(target,   init_dict, verbose=0)
  
 fit_indices = set()
 sample_combo = random.sample(list(enumerate(params)), init_sample_num)
 sample_indices, sample_params = zip(*sample_combo)
 fit_indices = fit_indices.union(sample_indices)
 
-explore_param_dict = dict()
+param_dict = OrderedDict()
 for i, param_name in enumerate(param_names):
-    explore_param_dict[param_name] = [sample[i] for sample in sample_params]    
-bo.explore(explore_param_dict)
+    param_dict[param_name] = [sample[i] for sample in sample_params]    
+bo.explore(param_dict)
 
 for iround in range(results.shape[0]-init_sample_num):
     #you can tune the gp parameters and bo parameters as follows
@@ -53,12 +52,11 @@ for iround in range(results.shape[0]-init_sample_num):
     
     acc = acc_dict[np.array(add_param).tostring()]
     if acc==max_acc:
-        print 'Only %d rounds to find the max accuracy %f, compared with %d' %(iround, max_acc, results.shape[0])
+        print 'Only %d rounds to find the max accuracy %f, compared with %d rounds' %(iround, max_acc, results.shape[0])
         break  
-        
-    explore_param_dict = dict()
+            
     for i, param_name in enumerate(param_names):
-        explore_param_dict[param_name] = [add_param[i]]    
-    bo.explore(explore_param_dict)
+        param_dict[param_name] = [add_param[i]]    
+    bo.explore(param_dict)
 
  

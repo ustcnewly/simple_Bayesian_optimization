@@ -1,4 +1,5 @@
 import numpy as np
+from collections import OrderedDict
 from bayes_opt import BayesianOptimization
 
 results = np.loadtxt('input_partial_results.txt')
@@ -20,27 +21,25 @@ for i, param_name in enumerate(param_names):
             all_params.append(combo_param)
     prev_params = all_params
 
-acc_dict = dict()
-tmp_param_dict = dict()
+acc_dict = OrderedDict()
 for iline in range(results.shape[0]):    
-    for i, param_name in enumerate(param_names):
-        tmp_param_dict[param_name] = results[iline, i]
-    acc_dict[np.array(tmp_param_dict.values()).tostring()] = results[iline][-1]
+    acc_dict[np.array(results[iline, :-1]).tostring()] = results[iline][-1]
 
 def target(**inargs):
-    return acc_dict[np.array(inargs.values()).tostring()]
+    ordered_values = [inargs[param_name] for param_name in param_names]
+    return  acc_dict[np.array(ordered_values).tostring()]
     
-init_param_dict = dict()
+init_dict = OrderedDict()
 for i, param_name in enumerate(param_names):
-    init_param_dict[param_name] = (min(param_ranges[i]), max(param_ranges[i]))
+    init_dict[param_name] = (min(param_ranges[i]), max(param_ranges[i]))
      
-bo = BayesianOptimization(target,   init_param_dict, verbose=0)
+bo = BayesianOptimization(target,   init_dict, verbose=0)
 
 done_params = np.reshape(results[:,:-1], (results.shape[0], nparam))
-explore_param_dict = dict()
+param_dict = OrderedDict()
 for i, param_name in enumerate(param_names):
-    explore_param_dict[param_name] = done_params[:, i]    
-bo.explore(explore_param_dict)
+    param_dict[param_name] = done_params[:, i]    
+bo.explore(param_dict)
 
 #you can tune the gp parameters and bo parameters as follows
 #gp_params = {'kernel': None, 'alpha': 1e-5}
