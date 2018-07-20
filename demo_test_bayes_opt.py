@@ -10,8 +10,11 @@ params = np.reshape(results[:,:-1], (results.shape[0], nparam))
 max_acc = np.max(results[:, -1]) 
 
 acc_dict = dict()
-for iline in range(results.shape[0]):
-    acc_dict[(results[iline][:-1]).tostring()] = results[iline][-1]
+tmp_param_dict = dict()
+for iline in range(results.shape[0]):    
+    for i, param_name in enumerate(param_names):
+        tmp_param_dict[param_name] = results[iline, i]
+    acc_dict[np.array(tmp_param_dict.values()).tostring()] = results[iline][-1]
 
 def target(**inargs):
     return acc_dict[np.array(inargs.values()).tostring()]
