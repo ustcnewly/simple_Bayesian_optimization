@@ -51,12 +51,12 @@ for iround in range(results.shape[0]-init_sample_num):
     add_param = params[add_index]
     
     acc = acc_dict[np.array(add_param).tostring()]
-    if acc==max_acc:
-        print 'Only %d rounds to find the max accuracy %f, compared with %d rounds' %(iround, max_acc, results.shape[0])
+    if acc>max_acc*0.9:
+        print 'Take %d rounds to find the accuracy %f' %(iround, acc)
         break  
             
     for i, param_name in enumerate(param_names):
         param_dict[param_name] = [add_param[i]]    
-    bo.explore(param_dict)
+    bo.explore(param_dict, eager=True)
 
  
