@@ -10,7 +10,7 @@ assert(nparam == results.shape[1]-1)
 params = np.reshape(results[:,:-1], (results.shape[0], nparam))
 max_acc = np.max(results[:, -1]) 
 
-acc_dict = OrderedDict()
+acc_dict = dict()
 for iline in range(results.shape[0]):    
     acc_dict[np.array(results[iline, :-1]).tostring()] = results[iline][-1]
 
@@ -54,7 +54,7 @@ for iround in range(results.shape[0]-init_sample_num):
     if acc>max_acc*0.9:
         print 'Take %d rounds to find the accuracy %f' %(iround, acc)
         break  
-            
+    
     for i, param_name in enumerate(param_names):
         param_dict[param_name] = [add_param[i]]    
     bo.explore(param_dict, eager=True)

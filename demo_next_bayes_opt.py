@@ -21,7 +21,7 @@ for i, param_name in enumerate(param_names):
             all_params.append(combo_param)
     prev_params = all_params
 
-acc_dict = OrderedDict()
+acc_dict = dict()
 for iline in range(results.shape[0]):    
     acc_dict[np.array(results[iline, :-1]).tostring()] = results[iline][-1]
 

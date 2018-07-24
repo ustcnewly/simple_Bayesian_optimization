@@ -14,10 +14,14 @@ This is a simple Bayesian optimization tool for hyper-parameter tuning based on 
 
 **Run:**
 
-* 'demo_test_bayes_opt.py' is used to test how fast bayes optimization can locate the optimal parameter. 
+* 'demo_test_bayes_opt.py' is used to simulate how fast bayes optimization can locate the optimal parameter given all the results under all the parameter settings. 
 
 * 'demo_test_bayes_opt.py' is used to recommend the next parameter to try, given a history of parameter-performance pairs.
+
+* 'demo_run_bayes_opt.py' is used to automatically tune the hyper-parameters given the initial results under at least 2 parameter settings. Replace the function in simulate_func.py with your own, in which the input are hyper-parameters and the output is performance. 
 
 **Note:**
 
 * you can try tuning the hyper parameters for Gaussian process and Bayesian optimization in the function 'bo.maximize(init_points=0, n_iter=0)'.
+
+* you can try different initial hyper-parameters.
