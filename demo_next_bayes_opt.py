@@ -41,10 +41,11 @@ for i, param_name in enumerate(param_names):
     param_dict[param_name] = done_params[:, i]    
 bo.explore(param_dict)
 
-#you can tune the gp parameters and bo parameters as follows
-#gp_params = {'kernel': None, 'alpha': 1e-5}
-#bo.maximize(init_points=0, n_iter=0, acq='cub', kappa=5,  **gp_params)
-bo.maximize(init_points=0, n_iter=0)
+#you can tune the gp parameters and bo parameters
+#when acq='ucb', set kappa within [10^-3, 10^-2, ..., 10^3]
+#when acq='poi' or 'ei', set xi within [10^-3, 10^-2, ..., 10^3]
+gp_params = {'kernel': None, 'alpha': 1e-5}
+bo.maximize(init_points=0, n_iter=0, acq='poi', xi=0.01,  **gp_params)
 utility = bo.util.utility(all_params, bo.gp, 0)
 
 sort_indices = np.argsort(utility)

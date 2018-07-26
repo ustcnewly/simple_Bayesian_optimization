@@ -47,7 +47,11 @@ bo.explore(param_dict)
 ##################################################
 # main loop
 for iter in range(max_iter):
-    bo.maximize(init_points=0, n_iter=0)
+    #you can tune the gp parameters and bo parameters
+    #when acq='ucb', set kappa within [10^-3, 10^-2, ..., 10^3]
+    #when acq='poi' or 'ei', set xi within [10^-3, 10^-2, ..., 10^3]
+    gp_params = {'kernel': None, 'alpha': 1e-5}
+    bo.maximize(init_points=0, n_iter=0, acq='poi', xi=0.01,  **gp_params)
     utility = bo.util.utility(all_params, bo.gp, 0)
     sort_indices = np.argsort(utility)
     sort_indices = sort_indices[:: -1]
@@ -57,6 +61,7 @@ for iter in range(max_iter):
         if not acc_dict.has_key(np.array(next_params).tostring()):            
             break
 
+    print next_params
     # evalue the model trained with next_params
     param_str = ' '.join(['%f'%next_param for next_param in next_params])
     cmd  = 'python simulate_func.py %s' %param_str

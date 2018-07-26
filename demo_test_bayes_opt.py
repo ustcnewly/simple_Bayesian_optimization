@@ -36,10 +36,11 @@ for i, param_name in enumerate(param_names):
 bo.explore(param_dict)
 
 for iround in range(results.shape[0]-init_sample_num):
-    #you can tune the gp parameters and bo parameters as follows
-    #gp_params = {'kernel': None, 'alpha': 1e-5}
-    #bo.maximize(init_points=0, n_iter=0, acq='cub', kappa=5,  **gp_params)
-    bo.maximize(init_points=0, n_iter=0)
+    #you can tune the gp parameters and bo parameters
+    #when acq='ucb', set kappa within [10^-3, 10^-2, ..., 10^3]
+    #when acq='poi' or 'ei', set xi within [10^-3, 10^-2, ..., 10^3]
+    gp_params = {'kernel': None, 'alpha': 1e-5}
+    bo.maximize(init_points=0, n_iter=0, acq='poi', xi=1000,  **gp_params)
     utility = bo.util.utility(params, bo.gp, 0) 
 
     sort_indices = np.argsort(utility)
@@ -51,7 +52,7 @@ for iround in range(results.shape[0]-init_sample_num):
     add_param = params[add_index]
     
     acc = acc_dict[np.array(add_param).tostring()]
-    if acc>max_acc*0.9:
+    if acc==max_acc:
         print 'Take %d rounds to find the accuracy %f' %(iround, acc)
         break  
     
